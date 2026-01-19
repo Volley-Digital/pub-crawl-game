@@ -75,13 +75,19 @@ export default function GameMaster() {
       .not("photo_url", "is", null) // Only fetch submissions with a photo_url
       .not("finished", "is", true); // Exclude finished submissions
 
+    const mappedSubs = (subs ?? []).map((item) => ({
+      ...item,
+      teams: Array.isArray(item.teams) && item.teams.length > 0 ? { name: item.teams[0].name } : null,
+      riddles: Array.isArray(item.riddles) && item.riddles.length > 0 ? { pub_name: item.riddles[0].pub_name, animal: item.riddles[0].animal } : null,
+    }));
+
     const map: Record<string, number> = {};
-    for (const s of (subs ?? []) as Row[]) {
+    for (const s of mappedSubs as Row[]) {
       map[s.team_id] = (map[s.team_id] ?? 0) + (s.points_awarded ?? 0);
     }
     setTotals(map);
 
-    setGallery((subs ?? []) as GalleryItem[]);
+    setGallery(mappedSubs as GalleryItem[]);
   }, []);
 
   useEffect(() => {

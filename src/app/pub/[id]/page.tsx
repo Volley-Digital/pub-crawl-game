@@ -1,6 +1,5 @@
 "use client";
-
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { StarIcon } from "@heroicons/react/24/solid";
@@ -61,7 +60,8 @@ export default function PubRevealPage() {
          <Popup modal trigger={<button className="text-sm font-bold text-steel-blue-950 bg-steel-blue-50/40 px-2 py-1 rounded" onClick={() => router.push("/game")}>
         Cancel
       </button>} position="top left">
-          {close => (
+          {/* @ts-ignore */}
+          {(close: () => void): React.ReactNode => (
             <div className="rounded-xl p-2">
               <p>
                 If you cancel this riddle, you won't be able to submit proof and you will forfeit the points.

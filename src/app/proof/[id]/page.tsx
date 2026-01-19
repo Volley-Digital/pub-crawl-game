@@ -194,7 +194,7 @@ export default function ProofPage() {
     <main className="min-h-screen p-6 max-w-xl flex items-end mx-auto">
       
       <div>
-        <button className="text-sm font-bold text-steel-blue-950 bg-steel-blue-50/40 px-2 py-1 rounded" onClick={() => router.push(`/pub/${riddle.id}`)}>
+        <button className="text-sm font-bold text-steel-blue-950 bg-steel-blue-50/40 px-2 py-1 rounded" onClick={() => router.push(`/pub/${riddle?.id}`)}>
           Back
         </button>
       <div className="mt-4 rounded-2xl  p-5 backdrop-blur-sm bg-steel-blue-50/40 shadow-sm">

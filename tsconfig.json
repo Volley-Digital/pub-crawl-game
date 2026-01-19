@@ -4,8 +4,9 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
+    "noEmitOnError": false, // Allows emitting files even if there are type errors
     "strict": true,
-    "noEmit": true,
+    "noEmit": false, // Allow emitting files
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",

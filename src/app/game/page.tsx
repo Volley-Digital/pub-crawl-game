@@ -16,6 +16,7 @@ type Riddle = {
   question: string;
   points_solve: number;
   points_photo: number;
+  maps_query: string;
   points_challenge: number;
   pub_name: string;
   pub_image_url: string;
