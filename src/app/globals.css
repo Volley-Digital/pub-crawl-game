@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import 'reactjs-popup/dist/index.css';
 
 :root {
   --background: #ffffff;
@@ -10,6 +11,19 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-steel-blue-50: #f3f8fb;
+  --color-steel-blue-100: #e4edf5;
+  --color-steel-blue-200: #d0e0ed;
+  --color-steel-blue-300: #b0cce0;
+  --color-steel-blue-400: #8ab0d0;
+  --color-steel-blue-500: #6e97c3;
+  --color-steel-blue-600: #5a80b5;
+  --color-steel-blue-700: #506fa5;
+  --color-steel-blue-800: #455c88;
+  --color-steel-blue-900: #3b4d6d;
+  --color-steel-blue-950: #283143;
+
+
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +37,20 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  background-image: url('/background.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+
+
+ body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  background-image: url('/background-2.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
