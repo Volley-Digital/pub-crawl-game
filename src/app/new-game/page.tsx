@@ -9,7 +9,7 @@ export default function NewGame() {
   const router = useRouter();
   const [joinCode, setJoinCode] = useState("PRAUGEZOO2026");
   const [teamName, setTeamName] = useState<"A" | "B">("A");
-  const [gameName, setGameName] = useState("Prauige Zoo Challenge");
+  const [gameName, setGameName] = useState("Prauge Zoo Challenge");
   const [gameStartTime, setGameStartTime] = useState("");
   const [gameEndTime, setGameEndTime] = useState("");
   const [finalUnlockTime, setFinalUnlockTime] = useState("");
@@ -32,6 +32,24 @@ export default function NewGame() {
     }
 
     try {
+      // Check if the join code is unique
+      const { data: existingCode, error: codeErr } = await supabase
+        .from("teams")
+        .select("join_code", { head: true, count: "exact" })
+        .eq("join_code", code);
+
+      if (codeErr) {
+        setErr("Failed to validate join code. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      if (existingCode && existingCode.length > 0) {
+        setErr("Join code already exists. Please use a different code.");
+        setLoading(false);
+        return;
+      }
+
       // Insert new game into the database
       const { data: game, error: gameErr } = await supabase
         .from("games")

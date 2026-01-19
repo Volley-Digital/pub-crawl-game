@@ -38,16 +38,24 @@ export default function GameMaster() {
   const userTeamId = session?.teamId ?? null;
 
   const fetchData = useCallback(async () => {
-    // Grab latest game
+    // Fetch the game ID related to the user's team
+    const { data: teamGame } = await supabase
+      .from("teams")
+      .select("game_id")
+      .eq("id", userTeamId)
+      .maybeSingle();
+
+    if (!teamGame) return;
+    setGameId(teamGame.game_id);
+
+    // Fetch game details
     const { data: g } = await supabase
       .from("games")
-      .select("id, end_time") // Fetch end_time
-      .order("created_at", { ascending: false })
-      .limit(1)
+      .select("id, end_time")
+      .eq("id", teamGame.game_id)
       .maybeSingle();
 
     if (!g) return;
-    setGameId(g.id);
 
     const { data: t } = await supabase
       .from("teams")

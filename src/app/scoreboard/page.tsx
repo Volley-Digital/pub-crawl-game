@@ -31,19 +31,27 @@ export default function ScoreboardPage() {
   // Load session to get user's team ID
   const session = loadSession();
   const userTeamId = session?.teamId ?? null;
-
+  
   useEffect(() => {
     (async () => {
-      // Grab latest game
+      // Fetch the game ID related to the user's team
+      const { data: teamGame } = await supabase
+        .from("teams")
+        .select("game_id")
+        .eq("id", userTeamId)
+        .maybeSingle();
+
+      if (!teamGame) return;
+      setGameId(teamGame.game_id);
+
+      // Fetch game details
       const { data: g } = await supabase
         .from("games")
-        .select("id, end_time") // Fetch end_time
-        .order("created_at", { ascending: false })
-        .limit(1)
+        .select("id, end_time")
+        .eq("id", teamGame.game_id)
         .maybeSingle();
 
       if (!g) return;
-      setGameId(g.id);
 
       // Check if the game has ended
       const currentTime = new Date();
@@ -61,12 +69,14 @@ export default function ScoreboardPage() {
         .from("submissions")
         .select("team_id, points_awarded")
         .eq("game_id", g.id);
+      console.log("Latest subs:", subs);
 
       const map: Record<string, number> = {};
       for (const s of (subs ?? []) as Row[]) {
         map[s.team_id] = (map[s.team_id] ?? 0) + (s.points_awarded ?? 0);
       }
       setTotals(map);
+      console.log("Latest game:", map);
 
       // Gallery (proved submissions with photo_url)
       const { data: gal, error: galErr } = await supabase

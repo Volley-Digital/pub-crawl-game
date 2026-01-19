@@ -64,7 +64,7 @@ export default function GamePage() {
 
   useEffect(() => {
     if (!teamId) return;
-
+    console.log("Loading game data for team:", teamId);
     (async () => {
       // get team -> game
       const { data: team } = await supabase
