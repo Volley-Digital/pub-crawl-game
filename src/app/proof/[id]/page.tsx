@@ -60,7 +60,7 @@ export default function ProofPage() {
   const [error, setError] = useState<string>("");
 
   const [challengeCompleted, setChallengeCompleted] = useState<boolean>(false);
-  console.log(submission);
+
   useEffect(() => {
     if (!session) router.push("/");
   }, [session, router]);
@@ -87,7 +87,7 @@ export default function ProofPage() {
         .from("submissions")
         .upsert(
           {
-            game_id: (r as any).game_id,
+            game_id: session.gameId,
             team_id: session.teamId,
             riddle_id: riddleId,
             status: "revealed",
@@ -110,7 +110,7 @@ export default function ProofPage() {
           .from("submissions")
           .select("id, points_awarded, status, photo_url")
           .eq("team_id", session.teamId)
-          .eq("riddle_id", riddleId)
+          .eq("game_id", session.gameId)
           .maybeSingle();
         setSubmission(s as any);
       } else {

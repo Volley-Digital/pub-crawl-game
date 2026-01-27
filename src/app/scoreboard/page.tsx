@@ -31,7 +31,7 @@ export default function ScoreboardPage() {
   // Load session to get user's team ID
   const session = loadSession();
   const userTeamId = session?.teamId ?? null;
-  
+
   useEffect(() => {
     (async () => {
       // Fetch the game ID related to the user's team
@@ -52,7 +52,7 @@ export default function ScoreboardPage() {
         .maybeSingle();
 
       if (!g) return;
-
+      console.log("Game details:", g, gameId);
       // Check if the game has ended
       const currentTime = new Date();
       const endTime = new Date(g.end_time);
@@ -69,7 +69,6 @@ export default function ScoreboardPage() {
         .from("submissions")
         .select("team_id, points_awarded")
         .eq("game_id", g.id);
-      console.log("Latest subs:", subs);
 
       const map: Record<string, number> = {};
       for (const s of (subs ?? []) as Row[]) {

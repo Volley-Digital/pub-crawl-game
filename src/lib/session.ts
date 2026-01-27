@@ -3,6 +3,7 @@ export type Session = {
   teamName: "A" | "B";
   joinCode: string;
   playerName: string;
+  gameId: string; // Added gameId to the session
 };
 
 const KEY = "pz_session_v1";
@@ -11,7 +12,7 @@ export function saveSession(s: Session) {
   localStorage.setItem(KEY, JSON.stringify(s));
 }
 
-export function loadSession() : Session | null {
+export function loadSession(): Session | null {
   if (typeof window === "undefined") return null; // server guard
 
   try {
@@ -22,7 +23,6 @@ export function loadSession() : Session | null {
     return null;
   }
 }
-
 
 export function clearSession() {
   localStorage.removeItem(KEY);

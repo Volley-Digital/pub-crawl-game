@@ -52,7 +52,7 @@ export default function RiddlePage() {
       .from("submissions")
       .upsert(
         {
-          game_id: riddle.game_id,
+          game_id: s.gameId,
           team_id: s.teamId,
           riddle_id: riddle.id,
           ...payload,

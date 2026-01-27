@@ -53,6 +53,7 @@ export default function JoinPage() {
       teamName: team.name,
       joinCode: team.join_code,
       playerName: name,
+      gameId: team.game_id, // Added gameId to the session
     });
 
     router.push("/game");
