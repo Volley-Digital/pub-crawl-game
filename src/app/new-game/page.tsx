@@ -96,6 +96,7 @@ export default function NewGame() {
         teamName: "A", // Assign team A for testing
         joinCode: code,
         playerName: "N/A",
+        gameId: game.id,
       });
 
       router.push(`/game`);
