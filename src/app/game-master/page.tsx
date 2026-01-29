@@ -85,8 +85,16 @@ export default function GameMaster() {
 
     const mappedSubs = (subs ?? []).map((item) => ({
       ...item,
-      teams: Array.isArray(item.teams) && item.teams.length > 0 ? { name: item.teams[0].name } : null,
-      riddles: Array.isArray(item.riddles) && item.riddles.length > 0 ? { pub_name: item.riddles[0].pub_name, animal: item.riddles[0].animal } : null,
+      teams: Array.isArray(item.teams)
+        ? item.teams.length > 0
+          ? { name: item.teams[0].name }
+          : null
+        : item.teams ?? null,
+      riddles: Array.isArray(item.riddles)
+        ? item.riddles.length > 0
+          ? { pub_name: item.riddles[0].pub_name, animal: item.riddles[0].animal }
+          : null
+        : item.riddles ?? null,
     }));
 
     const map: Record<string, number> = {};
@@ -165,7 +173,7 @@ export default function GameMaster() {
       </div>
 
       {/* Gallery */}
-      <div className="mt-24 m-6 p-4 rounded-2xl border-steel-blue-950  backdrop-blur-sm bg-steel-blue-50/40 shadow-sm text-steel-blue-950">
+      <div className="mt-24 m-6 p-4 rounded-2xl backdrop-blur-sm bg-steel-blue-50/40 shadow-sm text-steel-blue-950">
         <div className="flex items-end justify-between gap-3">
           <div>
             <h2 className="text-xl font-semibold">Verification</h2>
@@ -184,30 +192,30 @@ export default function GameMaster() {
                 {items.length === 0 ? (
                   <div className="mt-2 text-sm text-gray-500">No proofs yet.</div>
                 ) : (
-                  <div className={`mt-3 grid grid-cols-2 md:grid-cols-4 gap-3`}>
+                  <div className="mt-3 grid grid-cols-2 md:grid-cols-2 gap-3">
                     {items.map((it) => (
                       <figure
                         key={it.id}
-                        className={`rounded-2xl bg-white overflow-hidden ${it.verified ? "border-green-500" : "border-red-500"}`}
+                        className={`group rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-steel-blue-950 to-steel-blue-900 border-double border-10 border-steel-blue-900 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${it.verified ? "ring-2 ring-green-400" : "ring-2 ring-rose-400"}`}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={it.photo_url}
                           alt={it.riddles?.pub_name ?? "Proof"}
-                          className="w-full h-40 object-cover"
+                          className="w-full h-40 object-cover rounded-t-xl"
                           loading="lazy"
                         />
-                        <figcaption className="p-2 text-xs text-gray-700">
+                        <figcaption className="p-3 text-xs text-steel-blue-50">
                           <div className="font-semibold line-clamp-1">
                             {it.riddles?.pub_name ?? "Unknown pub"}
                           </div>
-                          <div className="text-gray-500 line-clamp-1">
+                          <div className="text-steel-blue-200 line-clamp-1">
                             {it.riddles?.animal ?? ""}
                           </div>
                           {!it.finished && (
                             <>
-                              <div className="mt-2 flex items-center gap-2">
-                                <label className="flex items-center gap-1">
+                              <div className="mt-3 flex flex-col gap-2">
+                                <label className="flex items-center gap-2 text-steel-blue-100">
                                   <input
                                     type="checkbox"
                                     checked={it.went_to_location}
@@ -215,7 +223,7 @@ export default function GameMaster() {
                                   />
                                   Went to Location
                                 </label>
-                                <label className="flex items-center gap-1">
+                                <label className="flex items-center gap-2 text-steel-blue-100">
                                   <input
                                     type="checkbox"
                                     checked={it.challenge_completed}
@@ -224,15 +232,15 @@ export default function GameMaster() {
                                   Challenge Completed
                                 </label>
                               </div>
-                              <div className="mt-2 flex gap-2">
+                              <div className="mt-3 grid grid-cols-2 gap-2">
                                 <button
-                                  className="text-sm text-green-600 underline"
+                                  className="rounded-xl bg-emerald-500/90 text-white px-3 py-2 text-xs font-semibold hover:bg-emerald-500"
                                   onClick={() => verifySubmission(it.id)}
                                 >
                                   Verify
                                 </button>
                                 <button
-                                  className="text-sm text-red-600 underline"
+                                  className="rounded-xl bg-rose-500/90 text-white px-3 py-2 text-xs font-semibold hover:bg-rose-500"
                                   onClick={() => rejectSubmission(it.id, it.went_to_location, it.challenge_completed)}
                                 >
                                   Reject

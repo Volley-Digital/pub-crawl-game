@@ -109,8 +109,8 @@ export default function NewGame() {
 
   return (
     <main className="min-h-screen flex items-end justify-end flex-row p-6">
-      <div className="w-full max-w-md rounded-2xl  p-6 backdrop-blur-sm bg-steel-blue-900/30">
-        <div className="space-y-4 text-steel-blue-100 ">
+      <div className="group w-full max-w-md rounded-2xl border-double border-6 border-steel-blue-900 p-6 shadow-sm bg-gradient-to-br from-steel-blue-950 to-steel-blue-900 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+        <div className="space-y-4 text-steel-blue-100">
           <div>
             <h1 className="text-3xl text-steel-blue-50  font-bold">
               Create New Game
@@ -119,7 +119,7 @@ export default function NewGame() {
           <div>
             <label className="text-sm font-medium">Join code</label>
             <input
-              className="mt-1 w-full rounded-xl border-4 border-double border-blue-50 p-3 text-lg"
+              className="mt-1 w-full rounded-xl border-4 border-double border-steel-blue-200 bg-steel-blue-950/30 p-3 text-lg text-steel-blue-50 placeholder:text-steel-blue-300"
               value={joinCode}
               onChange={(e) => setJoinCode(e.target.value)}
             />
@@ -127,7 +127,7 @@ export default function NewGame() {
           <div>
             <label className="text-sm font-medium">Game Name</label>
             <input
-              className="mt-1 w-full rounded-xl border-4 border-double border-blue-50 p-3 text-lg"
+              className="mt-1 w-full rounded-xl border-4 border-double border-steel-blue-200 bg-steel-blue-950/30 p-3 text-lg text-steel-blue-50 placeholder:text-steel-blue-300"
               value={gameName}
               onChange={(e) => setGameName(e.target.value)}
             />
@@ -136,7 +136,7 @@ export default function NewGame() {
             <label className="text-sm font-medium">Game Start Time</label>
             <input
               type="datetime-local"
-              className="mt-1 w-full rounded-xl border-4 border-double border-blue-50 p-3 text-lg"
+              className="mt-1 w-full rounded-xl border-4 border-double border-steel-blue-200 bg-steel-blue-950/30 p-3 text-lg text-steel-blue-50 placeholder:text-steel-blue-300"
               onChange={(e) => setGameStartTime(e.target.value)}
             />
           </div>
@@ -144,7 +144,7 @@ export default function NewGame() {
             <label className="text-sm font-medium">Game End Time</label>
             <input
               type="datetime-local"
-              className="mt-1 w-full rounded-xl border-4 border-double border-blue-50 p-3 text-lg"
+              className="mt-1 w-full rounded-xl border-4 border-double border-steel-blue-200 bg-steel-blue-950/30 p-3 text-lg text-steel-blue-50 placeholder:text-steel-blue-300"
               onChange={(e) => setGameEndTime(e.target.value)}
             />
           </div>
@@ -152,7 +152,7 @@ export default function NewGame() {
             <label className="text-sm font-medium">Final Unlock Time</label>
             <input
               type="datetime-local"
-              className="mt-1 w-full rounded-xl border-4 border-double border-blue-50 p-3 text-lg"
+              className="mt-1 w-full rounded-xl border-4 border-double border-steel-blue-200 bg-steel-blue-950/30 p-3 text-lg text-steel-blue-50 placeholder:text-steel-blue-300"
               onChange={(e) => setFinalUnlockTime(e.target.value)}
             />
           </div>

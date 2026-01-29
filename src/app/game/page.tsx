@@ -13,6 +13,8 @@ type Riddle = {
   id: string;
   animal: string;
   tier: "easy" | "med" | "hard";
+  zone: number;
+  icon: string;
   question: string;
   points_solve: number;
   points_photo: number;
@@ -87,7 +89,7 @@ export default function GamePage() {
       // all riddles
       const { data: rs } = await supabase
         .from("riddles")
-        .select("id, animal, tier, question, pub_image_url, points_solve, points_photo, points_challenge, is_final, sort_order, accepted_answers, pub_name, maps_query")
+        .select("id, animal, tier, zone, icon, question, pub_image_url, points_solve, points_photo, points_challenge, is_final, sort_order, accepted_answers, pub_name, maps_query")
         .order("sort_order", { ascending: true });
 
       setRiddles((rs ?? []) as Riddle[]);
@@ -134,41 +136,54 @@ export default function GamePage() {
     const finals = pool.filter((r) => r.is_final);
     const nonFinal = pool.filter((r) => !r.is_final);
 
-    const result: Riddle[] = [];
-
-    // Show only the final riddle if 30 minutes or less remain
-    if (timeInfo.msLeft <= 30 * 60 * 1000) {
-      if (finals.length) result.push(finals[0]);
-      return result; // Return only the final riddle
+    // Show only the final riddle after unlock time
+    if (timeInfo.finalUnlocked) {
+      return finals.length ? [finals[0]] : [];
     }
 
     // If no other riddles are available, show the final riddle early
     if (nonFinal.length === 0 && finals.length) {
-      result.push(finals[0]);
-      return result;
+      return [finals[0]];
     }
 
-    // Otherwise, exclude the final riddle
-    function pickTier(t: "easy" | "med" | "hard") {
-      return nonFinal.find((r) => r.tier === t) ?? null;
+    // Otherwise, show all non-final riddles
+    return nonFinal;
+  }, [riddles, completedRiddleIds, skippedRiddleIds, timeInfo.finalUnlocked]);
+
+  const tierOrder: Record<Riddle["tier"], number> = {
+    easy: 1,
+    med: 2,
+    hard: 3,
+  };
+
+  const tierBadgeClass = (tier: Riddle["tier"]) => {
+    switch (tier) {
+      case "easy":
+        return "bg-emerald-100 text-emerald-900";
+      case "med":
+        return "bg-amber-100 text-amber-900";
+      case "hard":
+      default:
+        return "bg-rose-100 text-rose-900";
     }
+  };
 
-    const easy = pickTier("easy");
-    const med = pickTier("med");
-    const hard = pickTier("hard");
-
-    for (const x of [easy, med, hard]) {
-      if (x && !result.find((r) => r.id === x.id)) result.push(x);
-    }
-
-    // Fill up to 3 choices if needed
-    for (const r of nonFinal) {
-      if (result.length >= 3) break;
-      if (!result.find((x) => x.id === r.id)) result.push(r);
-    }
-
-    return result.slice(0, 3);
-  }, [riddles, completedRiddleIds, skippedRiddleIds, timeInfo.msLeft]);
+  const availableZone1 = useMemo(
+    () =>
+      available
+        .filter((r) => r.zone === 1)
+        .slice()
+        .sort((a, b) => tierOrder[a.tier] - tierOrder[b.tier]),
+    [available]
+  );
+  const availableZone2 = useMemo(
+    () =>
+      available
+        .filter((r) => r.zone === 2)
+        .slice()
+        .sort((a, b) => tierOrder[a.tier] - tierOrder[b.tier]),
+    [available]
+  );
 
   function fmt(ms: number) {
     const s = Math.floor(ms / 1000);
@@ -229,39 +244,115 @@ export default function GamePage() {
         </div>
       </div>
       <div className="pt-28 p-6">
+        {timeInfo.locked && (
+          <div className="mb-6 rounded-2xl backdrop-blur-sm bg-steel-blue-50/30 shadow-sm overflow-hidden border-double border-6 border-steel-blue-900">
+            <iframe
+              src="https://www.google.com/maps/d/embed?mid=1mxp4T7oD0b4rbBoH7h8qCshswExnU2I&ehbc=2E312F"
+              className="w-full h-[420px]"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+        )}
         <div className="backdrop-blur-sm bg-steel-blue-50/30 px-4 pt-4 pb-6 rounded-2xl">
-          <span className="text-sm text-steel-blue-950">{game ? fmt(timeInfo.msLeft) : "—"}</span>
-
-          <h2 className="text-xl font-semibold text-steel-blue-950">Available riddles</h2>
-          <div className="mt-3 space-y-3">
-            {available.map((r) => (
-              <Link
-                key={r.id}
-                href={timeInfo.locked ? "#" : `/riddles/${r.id}`}
-                className={` rounded-2xl border-double border-6 border-steel-blue-900 p-3 shadow-sm bg-steel-blue-950 flex justify-between items-center ${
-                  timeInfo.locked ? "opacity-50 pointer-events-none" : ""
-                }`}
-              >
-                <div className="flex items-center mt-1 gap-2">
-                  <PuzzlePieceIcon className="size-16 text-steel-blue-300 -mt-2" />
-                  <div>
-                    <div className="text-2xl font-semibold text-steel-blue-50">
-                      Riddle +{r.points_solve}
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-xl font-semibold text-steel-blue-950">Available riddles</h2>
+            <span className="inline-flex items-center rounded-full bg-steel-blue-900/10 px-3 py-1 text-xs font-semibold text-steel-blue-900">
+              {game ? fmt(timeInfo.msLeft) : "—"}
+            </span>
+          </div>
+          <div className="mt-3 space-y-6">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-steel-blue-900/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-steel-blue-900">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                🏛️ Zone 1
+              </div>
+              <div className="mt-2 grid grid-cols-3 gap-3">
+                {availableZone1.map((r) => (
+                  <Link
+                    key={r.id}
+                    href={timeInfo.locked ? "#" : `/riddles/${r.id}`}
+                    className={`group rounded-2xl border-double border-6 border-steel-blue-900 p-3 shadow-sm bg-gradient-to-br from-steel-blue-950 to-steel-blue-900 flex flex-col gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steel-blue-300 ${
+                      timeInfo.locked ? "opacity-50 pointer-events-none" : ""
+                    }`}
+                  >
+                    {r.is_final && (
+                      <div className="w-full text-steel-blue-200 mb-1 text-xs font-semibold tracking-wide">
+                        FINAL RIDDLE
                       </div>
-                    <div className="flex items-center justify-between">
-                      
-                      <div className="text-sm font-semibold text-steel-blue-300">
-                        Challenge: +{r.points_challenge}
+                    )}
+                    <div className="flex items-center gap-2">
+                      <PuzzlePieceIcon className="size-10 text-steel-blue-200" />
+                      <div className="text-lg font-semibold text-steel-blue-50">
+                        +{r.points_solve}
                       </div>
                     </div>
+                    <div className="flex items-center justify-between">
+                     
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${tierBadgeClass(r.tier)}`}>
+                        {r.tier}
+                      </span>
+                    </div>
+                    <div className="text-xs font-semibold text-steel-blue-300">
+                      Challenge: +{r.points_challenge}
+                    </div>
+
+                  </Link>
+                ))}
+                {!availableZone1.length && (
+                  <div className="text-sm text-steel-blue-950 mt-2">
+                    No riddles in Zone 1.
                   </div>
-                </div>
-                
-                <ArrowRightCircleIcon className="size-12 text-steel-blue-900 mt-2" />
-              </Link>
-            ))}
+                )}
+              </div>
+            </div>
+
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-steel-blue-900/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-steel-blue-900">
+                <span className="h-2 w-2 rounded-full bg-amber-500" />
+                🏰 Zone 2
+              </div>
+              <div className="mt-2 grid grid-cols-3 gap-3">
+                {availableZone2.map((r) => (
+                  <Link
+                    key={r.id}
+                    href={timeInfo.locked ? "#" : `/riddles/${r.id}`}
+                    className={`group rounded-2xl border-double border-6 border-steel-blue-900 p-3 shadow-sm bg-gradient-to-br from-steel-blue-950 to-steel-blue-900 flex flex-col gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steel-blue-300 ${
+                      timeInfo.locked ? "opacity-50 pointer-events-none" : ""
+                    }`}
+                  >
+                    {r.is_final && (
+                      <div className="w-full text-steel-blue-200 mb-1 text-xs font-semibold tracking-wide">
+                        FINAL RIDDLE
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <PuzzlePieceIcon className="size-10 text-steel-blue-200" />
+                      <div className="text-lg font-semibold text-steel-blue-50">
+                        +{r.points_solve}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                     
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${tierBadgeClass(r.tier)}`}>
+                        {r.tier}
+                      </span>
+                    </div>
+                    <div className="text-xs font-semibold text-steel-blue-300">
+                      Challenge: +{r.points_challenge}
+                    </div>
+                  </Link>
+                ))}
+                {!availableZone2.length && (
+                  <div className="text-sm text-steel-blue-950 mt-2">
+                    No riddles in Zone 2.
+                  </div>
+                )}
+              </div>
+            </div>
+
             {!available.length && (
-              <div className="text-sm text-steel-blue-950 mt-4">
+              <div className="text-sm text-steel-blue-950 mt-1">
                 No riddles left — head to the finale.
               </div>
             )}
@@ -269,39 +360,47 @@ export default function GamePage() {
         </div>
       <div className="pt-8">
         <div className="backdrop-blur-sm bg-steel-blue-50/30 px-4 pt-4 pb-6 rounded-2xl">
-          <h2 className="text-xl font-semibold text-steel-blue-950">Completed riddles</h2>
-          <div className="mt-3 space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold uppercase text-emerald-900">
+              Completed riddles
+            </span>
+          </div>
+          <div className="mt-3 space-y-3 grid grid-cols-1">
             {riddles.filter((r) => completedRiddleIds.has(r.id)).map((r) => (
               <div
                 key={r.id}
-                className="block rounded-2xl  shadow-sm bg-steel-blue-950 border-double border-10 border-steel-blue-900"
+                className="group block rounded-2xl shadow-sm bg-gradient-to-br from-steel-blue-950 to-steel-blue-900 border-double border-10 border-steel-blue-900 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
               >
                 <img src={r.pub_image_url}  alt={r.pub_name} className="w-full h-48 object-cover rounded-t-lg" />
-                <div className="relative flex flex-row justify-center rounded-2xl gap-1 bg-white overflow-hidden -mt-5 mx-20">
+                <div className="relative flex flex-row justify-center rounded-2xl gap-2 bg-white/90 backdrop-blur-sm overflow-hidden -mt-5 mx-16 px-2 py-1 shadow-sm">
+                  <div className="text-sm text-steel-blue-950 flex items-center px-1">
+                    <span className="text-2xl" aria-hidden="true">{r.icon}</span>
+                  </div>
                   <a 
-                    className="text-sm text-steel-blue-950 flex items-center "
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.maps_query)}`}
+                    className="text-sm text-steel-blue-950 flex items-center"
+                    href={`${r.maps_query}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                     <MapPinIcon className="size-10 text-steel-blue-950 rounded-full block pointer-events-none" />
+                     <MapPinIcon className="size-9 text-steel-blue-950 rounded-full block pointer-events-none" />
                   </a>
-                  <div className="relative size-11">
-                    <StarIcon className="size-11 text-yellow-500 block pointer-events-none" />
+                  <div className="relative size-10">
+                    <StarIcon className="size-10 text-yellow-500 block pointer-events-none" />
                     <span className="absolute inset-0 flex items-center justify-center pointer-events-none"> 
-                      <span className="mt-0.5 pointer-none text-steel-blue-50 font-semibold">
+                      <span className="mt-0.5 pointer-none text-steel-blue-50 font-semibold text-sm">
                       {submissionsMap.get(r.id)?.points_awarded ?? 0}
                       </span> 
                     </span> 
                   </div>
-                  <div className="text-sm text-steel-blue-950 flex items-center ">
-                    <CheckCircleIcon  className="size-10 text-green-600 rounded-full block pointer-events-none" />
+                  <div className="text-sm text-steel-blue-950 flex items-center">
+                    <CheckCircleIcon  className="size-9 text-green-600 rounded-full block pointer-events-none" />
                   </div>
                 </div>
-                <div className="p-4 mx-auto">
-                  <div className="text-xl text-center text-steel-blue-50">
-                    {r.pub_name} - "The {r.animal}"
+                <div className="p-4 mx-auto text-center">
+                  <div className="text-xl text-steel-blue-50 font-semibold">
+                    {r.pub_name}
                   </div>
+                  <div className="text-sm text-steel-blue-200">"The {r.animal}"</div>
                 </div>
               
               </div>

@@ -26,6 +26,7 @@ export default function RiddlePage() {
   const [answer, setAnswer] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showCorrectView, setShowCorrectView] = useState(false);
 
   useEffect(() => {
     const s = loadSession();
@@ -86,7 +87,8 @@ export default function RiddlePage() {
       points_awarded: riddle.points_solve,
     });
 
-    router.push(`/pub/${riddle.id}`);
+    setShowCorrectView(true);
+    setLoading(false);
   }
 
   async function skip() {
@@ -114,6 +116,25 @@ export default function RiddlePage() {
     );
   }
 
+  if (showCorrectView) {
+    return (
+      <main className="min-h-screen flex items-center justify-center p-6 max-w-xl mx-auto">
+        <div className="rounded-2xl text-steel-blue-950 p-8 backdrop-blur-sm bg-steel-blue-50/40 shadow-sm text-center">
+          <div className="text-6xl mb-4">🎉</div>
+          <h1 className="text-4xl font-bold text-steel-blue-950 mb-2">Correct!</h1>
+          <p className="text-lg text-steel-blue-900 mb-2">You earned {riddle.points_solve} points!</p>
+          <p className="text-sm text-steel-blue-800 mb-6">Now let's find the pub location...</p>
+          <button
+            className="rounded-xl bg-steel-blue-950 text-white px-8 py-4 font-semibold text-lg"
+            onClick={() => router.push(`/pub/${riddle.id}`)}
+          >
+            Continue to Location
+          </button>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen flex items-end p-6 max-w-xl mx-auto">
       <div>
@@ -128,14 +149,24 @@ export default function RiddlePage() {
           <div className="mt-5">
             <label className="text-sm font-medium text-steel-blue-950">Answer (animal)</label>
             <input
-              className="mt-1 w-full rounded-xl border-double border-4 border-steel-blue-950 p-3 text-lg"
+              className={`mt-1 w-full rounded-xl border-double border-4 p-3 text-lg ${
+                err ? "border-red-600 bg-red-50" : "border-steel-blue-950"
+              }`}
               placeholder="Choose your answer here"
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
             />
           </div>
 
-          {err && <div className="mt-3 text-sm text-red-600">{err}</div>}
+          {err && (
+            <div className="mt-4 rounded-xl border-2 border-red-600 bg-red-50 px-4 py-3 text-red-700">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">❌</span>
+                <span className="font-semibold">Wrong answer</span>
+              </div>
+              <div className="mt-1 text-sm">{err}</div>
+            </div>
+          )}
 
           <div className="mt-5 grid grid-cols-2 gap-2">
             <button

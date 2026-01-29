@@ -40,9 +40,7 @@ export default function PubRevealPage() {
 
   const mapsUrl = useMemo(() => {
     if (!riddle) return "#";
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-      riddle.maps_query
-    )}`;
+    return `${riddle.maps_query}`;
   }, [riddle]);
 
   if (!riddle) {
@@ -107,7 +105,7 @@ export default function PubRevealPage() {
 
         <div className="mt-4 rounded-xl border-double border-4 border-steel-blue-950  p-4 mb-16">
           <div className="text-sm font-semibold">Challenge (+ {riddle.points_challenge} Points)</div>
-          <div className="mt-1 text-sm text-steel-blue-950">{riddle.challenge_text}</div>
+          <div className="mt-1 text-md text-steel-blue-950">{riddle.challenge_text}</div>
         </div>
 
 

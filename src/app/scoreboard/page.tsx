@@ -124,9 +124,15 @@ export default function ScoreboardPage() {
       {/* Existing totals UI */}
       <div className="p-6 mt-12 grid grid-cols-2 md:grid-cols-2 gap-3 ">
         {teams.map((t) => (
-          <div key={t.id} className=" rounded-2xl border-double border-6 border-steel-blue-900 p-3 shadow-sm bg-steel-blue-950">
-            <div className="text-sm text-steel-blue-50">Team {t.name}</div>
-            <div className="text-3xl text-steel-blue-50 font-bold">{totals[t.id] ?? 0}</div>
+          <div
+            key={t.id}
+            className="group rounded-2xl border-double border-6 border-steel-blue-900 p-4 shadow-sm bg-gradient-to-br from-steel-blue-950 to-steel-blue-900 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+          >
+            <div className="flex items-baseline gap-2 -mt-2">
+              <div className="text-xs uppercase tracking-wide text-steel-blue-200">Team</div>
+              <div className="text-lg text-steel-blue-50 font-semibold">{t.name}</div>
+            </div>
+            <div className="mt-1 text-4xl text-steel-blue-50 font-bold">{totals[t.id] ?? 0}</div>
           </div>
         ))}
       </div>
@@ -156,35 +162,36 @@ export default function ScoreboardPage() {
                 {items.length === 0 ? (
                   <div className="mt-2 text-sm text-gray-500">No proofs yet.</div>
                 ) : (
-                  <div className={`${gameEnded || isUserTeam ? "" : "blur-overlay"} pr-6 mt-3 grid grid-cols-1 md:grid-cols-4 gap-3 `}>
+                  <div className={`${gameEnded || isUserTeam ? "" : "blur-overlay"} pr-6 mt-3 grid grid-cols-2 md:grid-cols-2 gap-3 `}>
                     {items.map((it) => (
                       <figure
                         key={it.id}
-                        className={it.verified ? "block rounded-2xl w-full shrink-0 shadow-sm bg-steel-blue-950 border-double border-10 border-steel-blue-900" : "block rounded-2xl shrink-0 shadow-sm bg-steel-blue-950 border-double border-10 border-steel-blue-900"} >
+                        className="group block rounded-2xl w-full shrink-0 shadow-sm bg-gradient-to-br from-steel-blue-950 to-steel-blue-900 border-double border-10 border-steel-blue-900 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                      >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={it.photo_url}
                           alt={it.riddles?.pub_name ?? "Proof"}
-                          className="w-full h-40 object-cover"
+                          className="w-full h-40 object-cover rounded-t-xl"
                           loading="lazy"
                         />
                         <div className="relative w-full overflow-hidden -mt-4 flex justify-center">
-                          <div className="text-sm text-steel-blue-950 flex items-center ">
+                          <div className="text-sm text-steel-blue-950 flex items-center bg-white/90 backdrop-blur-sm rounded-full px-1 py-1 shadow-sm">
                             {it.verified ? 
-                            <CheckCircleIcon  className="size-8 bg-white text-green-600 rounded-full block pointer-events-none" />
+                            <CheckCircleIcon  className="size-8 text-green-600 rounded-full block pointer-events-none" />
                             :
                             !it.finished ? 
-                              <QuestionMarkCircleIcon  className="size-8 bg-white text-orange-500 rounded-full block pointer-events-none" />
+                              <QuestionMarkCircleIcon  className="size-8 text-orange-500 rounded-full block pointer-events-none" />
                               : 
-                              <XCircleIcon  className="size-8 bg-white text-red-600  rounded-full block pointer-events-none" />
+                              <XCircleIcon  className="size-8 text-red-600  rounded-full block pointer-events-none" />
                             }                 
                           </div>
                         </div>
-                        <figcaption className="p-2 text-md text-steel-blue-50 text-center">
+                        <figcaption className="p-3 text-sm text-steel-blue-50 text-center">
                           <div className="font-semibold line-clamp-1">
-                            {it.riddles?.pub_name ?? "Unknown pub"} - "The {it.riddles?.animal ?? ""}"
+                            {it.riddles?.pub_name ?? "Unknown pub"}
                           </div>
-      
+                          <div className="text-xs text-steel-blue-200">"The {it.riddles?.animal ?? ""}"</div>
                         </figcaption>
                       </figure>
                     ))}
